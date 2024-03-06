@@ -3,14 +3,14 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { ErrorMiddleware } from './middleware/error.middleware';
+import { ErrorMiddleware } from './middlewares/error.middleware';
 @Module({
   imports: [
     UsersModule,
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'db.sqlite',
-      entities: [__dirname + '/**/*.entity{.ts}'],
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true, // TODO: change to false
     }),
   ],
