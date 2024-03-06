@@ -10,7 +10,7 @@ import { ErrorMiddleware } from './middleware/error.middleware';
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'db.sqlite',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      entities: [__dirname + '/**/*.entity{.ts}'],
       synchronize: true, // TODO: change to false
     }),
   ],
