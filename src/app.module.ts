@@ -4,9 +4,11 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ErrorMiddleware } from './middlewares/error.middleware';
+import { ToDoModule } from './to-do/to-do.module';
 @Module({
   imports: [
     UsersModule,
+    ToDoModule,
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'db.sqlite',
