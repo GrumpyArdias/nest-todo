@@ -6,12 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { ToDoService } from './to-do.service';
 import { CreateToDoDto } from './dto/create-to-do.dto';
 import { UpdateToDoDto } from './dto/update-to-do.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtStrategy } from 'src/auth/jwt.strategy';
 
 @Controller('to-do')
+@UseGuards(AuthGuard('jwt'), JwtStrategy)
 export class ToDoController {
   constructor(private readonly toDoService: ToDoService) {}
 

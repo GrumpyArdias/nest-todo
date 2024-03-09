@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsDate,
   IsNotEmpty,
   IsNumber,
   IsString,
@@ -19,6 +20,14 @@ export class CreateToDoDto {
   @IsNotEmpty()
   @IsNumber()
   userId: number;
+
+  @IsNotEmpty()
+  @IsDate()
+  createdAt: Date;
+
+  @IsNotEmpty()
+  @IsDate()
+  updatedAt: Date;
 
   constructor(text: string) {
     this.text = text;

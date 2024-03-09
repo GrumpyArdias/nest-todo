@@ -8,5 +8,6 @@ import { ToDo } from './entities/to-do.entity';
   imports: [TypeOrmModule.forFeature([ToDo])],
   controllers: [ToDoController],
   providers: [ToDoService],
+  exports: [ToDoService],
 })
 export class ToDoModule {}

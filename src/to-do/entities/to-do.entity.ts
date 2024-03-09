@@ -20,4 +20,10 @@ export class ToDo {
   @ManyToOne(() => User, { eager: true })
   @JoinColumn({ name: 'userId' })
   user: User;
+
+  @Column()
+  createdAt: Date;
+
+  @Column()
+  updatedAt: Date;
 }

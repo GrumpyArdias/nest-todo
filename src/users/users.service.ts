@@ -45,4 +45,8 @@ export class UsersService {
     await this.userRepository.delete(id);
     return `the user ${id} has been deleted`;
   }
+
+  async findOneByEmail(mail: string) {
+    return await this.userRepository.findOneBy({ mail });
+  }
 }
