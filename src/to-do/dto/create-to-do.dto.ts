@@ -29,7 +29,11 @@ export class CreateToDoDto {
   @IsDate()
   updatedAt: Date;
 
-  constructor(text: string) {
+  constructor(text: string, userId: number) {
     this.text = text;
+    this.userId = userId;
+    this.closed = false;
+    this.createdAt = new Date();
+    this.updatedAt = new Date();
   }
 }

@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateToDoDto } from './dto/create-to-do.dto';
 import { UpdateToDoDto } from './dto/update-to-do.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,23 +15,76 @@ export class ToDoService {
     @InjectRepository(ToDo) private toDoRepository: Repository<ToDo>,
   ) {}
 
-  async create(createToDoDto: CreateToDoDto) {
-    const newToDo = this.toDoRepository.create(createToDoDto);
+  async create(userId: number, createToDoDto: CreateToDoDto) {
+    const newCreateToDoDto = new CreateToDoDto(createToDoDto.text, userId);
+    const newToDo = this.toDoRepository.create(newCreateToDoDto);
     await this.toDoRepository.save(newToDo);
     return newToDo;
   }
 
-  async findAll() {
-    return await this.toDoRepository.find();
+  async findAll(userId: number) {
+    const toDos = await this.toDoRepository
+      .createQueryBuilder('toDo')
+      .leftJoinAndSelect('toDo.user', 'user')
+      .select([
+        'toDo.id',
+        'toDo.text',
+        'toDo.closed',
+        'toDo.createdAt',
+        'toDo.updatedAt',
+        'user.id',
+        'user.name',
+      ])
+      .where('user.id = :userId', { userId })
+      .getMany();
+
+    return toDos;
   }
 
-  async findOne(id: number) {
-    return await this.toDoRepository.findOne({ where: { id } });
-  }
+  async findOne(toDoId: number, userId: number) {
+    const toDo = await this.toDoRepository
+      .createQueryBuilder('toDo')
+      .leftJoinAndSelect('toDo.user', 'user')
+      .select([
+        'toDo.id',
+        'toDo.text',
+        'toDo.closed',
+        'toDo.createdAt',
+        'toDo.updatedAt',
+        'user.id',
+        'user.name',
+      ])
+      .where('toDo.id = :toDoId', { toDoId })
+      .andWhere('user.id = :userId', { userId })
+      .getOne();
 
+    if (!toDo) {
+      throw new NotFoundException(`ToDo with ID ${toDoId} not found`);
+    }
+
+    return toDo;
+  }
   async update(id: number, updateToDoDto: UpdateToDoDto) {
-    const { text, closed } = updateToDoDto;
-    await this.toDoRepository.update(id, { text, closed });
+    const toDo = await this.toDoRepository.findOneBy({ id });
+
+    if (!toDo) {
+      throw new NotFoundException(`ToDo with ID ${id} not found`);
+    }
+
+    const updateData = {};
+    if (updateToDoDto.hasOwnProperty('text')) {
+      updateData['text'] = updateToDoDto.text;
+    }
+    if (updateToDoDto.hasOwnProperty('closed')) {
+      updateData['closed'] = updateToDoDto.closed;
+    }
+
+    if (Object.keys(updateData).length > 0) {
+      await this.toDoRepository.update(id, updateData);
+    } else {
+      throw new BadRequestException('No valid fields provided for update');
+    }
+
     return `The to do ${id} has been updated`;
   }
 
@@ -35,7 +92,23 @@ export class ToDoService {
     await this.toDoRepository.delete(id);
     return `The to do ${id} has been deleted`;
   }
-  async findAllClosed() {
-    return await this.toDoRepository.find({ where: { closed: true } });
+  async findAllClosed(userId: number) {
+    const toDos = await this.toDoRepository
+      .createQueryBuilder('toDo')
+      .leftJoinAndSelect('toDo.user', 'user')
+      .select([
+        'toDo.id',
+        'toDo.text',
+        'toDo.closed',
+        'toDo.createdAt',
+        'toDo.updatedAt',
+        'user.id',
+        'user.name',
+      ])
+      .where('user.id = :userId', { userId })
+      .andWhere('toDo.closed = :closed', { closed: true })
+      .getMany();
+
+    return toDos;
   }
 }

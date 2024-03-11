@@ -6,13 +6,15 @@ import {
   IsString,
   IsBoolean,
   IsDate,
+  IsNotEmpty,
 } from 'class-validator';
 
 export class UpdateToDoDto extends PartialType(CreateToDoDto) {
   @IsOptional()
+  @IsNotEmpty()
   @IsString()
   @Length(1, 255)
-  text: string;
+  text?: string;
 
   @IsOptional()
   @IsBoolean()

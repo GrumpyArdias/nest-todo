@@ -13,15 +13,35 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtStrategy } from 'src/auth/jwt.strategy';
-
+import * as bcryptjs from 'bcryptjs';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+@ApiTags('Users')
 @Controller('users')
+@ApiBearerAuth()
+@ApiCreatedResponse({
+  description: 'The User has been successfully created.',
+})
+@ApiForbiddenResponse({ description: 'Forbidden.' })
 @UseGuards(AuthGuard('jwt'), JwtStrategy)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    const hashedPassword = bcryptjs.hashSync(
+      createUserDto.password,
+      bcryptjs.genSaltSync(),
+    );
+    const { name, mail } = await this.usersService.create({
+      ...createUserDto,
+      password: hashedPassword,
+    });
+    return { name, mail };
   }
 
   @Get()
@@ -30,8 +50,8 @@ export class UsersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findOne(@Param('id') id: string) {
+    return await this.usersService.findOne(+id);
   }
 
   @Patch(':id')

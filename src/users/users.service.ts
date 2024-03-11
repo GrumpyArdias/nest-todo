@@ -24,11 +24,14 @@ export class UsersService {
   }
 
   async findAll() {
-    return await this.userRepository.find();
+    return await this.userRepository.find({
+      select: ['id', 'name', 'mail'],
+    });
   }
 
   async findOne(id: number) {
-    return await this.userRepository.findOne({ where: { id } });
+    const { name, mail } = await this.userRepository.findOne({ where: { id } });
+    return { name, mail };
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
