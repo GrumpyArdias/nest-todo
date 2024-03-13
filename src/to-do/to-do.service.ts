@@ -95,9 +95,19 @@ export class ToDoService {
     return `The to-do ${id} has been updated`;
   }
 
-  async remove(id: number) {
-    await this.toDoRepository.delete(id);
-    return `The to do ${id} has been deleted`;
+  async remove(userId: number, id: number) {
+    const result = await this.toDoRepository.delete({
+      id,
+      user: { id: userId },
+    });
+
+    if (result.affected === 0) {
+      throw new NotFoundException(
+        `ToDo with ID ${id} not found or you are not the owner.`,
+      );
+    }
+
+    return `The to-do ${id} has been deleted`;
   }
   async findAllClosed(userId: number) {
     const toDos = await this.toDoRepository

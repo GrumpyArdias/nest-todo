@@ -62,7 +62,7 @@ export class ToDoController {
     return this.toDoService.update(Req.user.sub, +id, updateToDoDto);
   }
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.toDoService.remove(+id);
+  remove(@Param('id') id: string, @Request() Req) {
+    return this.toDoService.remove(Req.user.sub, +id);
   }
 }
