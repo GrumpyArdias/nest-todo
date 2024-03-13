@@ -55,10 +55,11 @@ export class ToDoController {
   @Patch(':id')
   async updateToDo(
     @Param('id') id: number,
+    @Request() Req,
     @Body(new ValidationPipe({ skipMissingProperties: true }))
     updateToDoDto: UpdateToDoDto,
   ) {
-    return this.toDoService.update(id, updateToDoDto);
+    return this.toDoService.update(Req.user.sub, +id, updateToDoDto);
   }
   @Delete(':id')
   remove(@Param('id') id: string) {

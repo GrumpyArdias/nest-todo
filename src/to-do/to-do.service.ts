@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { CreateToDoDto } from './dto/create-to-do.dto';
 import { UpdateToDoDto } from './dto/update-to-do.dto';
@@ -64,11 +65,17 @@ export class ToDoService {
 
     return toDo;
   }
-  async update(id: number, updateToDoDto: UpdateToDoDto) {
+  async update(userId: number, id: number, updateToDoDto: UpdateToDoDto) {
     const toDo = await this.toDoRepository.findOneBy({ id });
 
     if (!toDo) {
       throw new NotFoundException(`ToDo with ID ${id} not found`);
+    }
+
+    if (toDo.user.id !== userId) {
+      throw new UnauthorizedException(
+        `You are not authorized to update this to-do.`,
+      );
     }
 
     const updateData = {};
@@ -85,7 +92,7 @@ export class ToDoService {
       throw new BadRequestException('No valid fields provided for update');
     }
 
-    return `The to do ${id} has been updated`;
+    return `The to-do ${id} has been updated`;
   }
 
   async remove(id: number) {
